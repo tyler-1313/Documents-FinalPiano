@@ -1,4 +1,5 @@
 import pygame
+## x coordinates for Notes on virtual piano, Blue Notes get Blit at these coords
 DrawInputsList={'1':'19', '2':'25', '3':'45', '4':'71', '5':'73', '6':'91',
                 '7':'96', '8':'116', '9':'142', '10':'144', '11':'162', 
                 '12':'168', '13':'187', '14':'192', '15':'213', '16':'238',
@@ -16,6 +17,7 @@ DrawInputsList={'1':'19', '2':'25', '3':'45', '4':'71', '5':'73', '6':'91',
                 '83':'1167', '84':'1172',
                 '85':'1191', '86':'1196', '87':'1217', '88':'1242'
                 }
+## Coordinates for vertical rectangles above virtual piano, 0 or 89 is rest
 XValues={'0':'-50','1':'23', '2':'41','3':'48','4':'72','5':'89','6':'96', '7':'112','8':'120', '9':'144',
          '10':'160','11':'167','12':'184','13':'190','14':'208','15':'215','16':'239', '17':'256',
          '18':'262','19':'279', '20':'287', '21':'310','22':'327','23':'334', '24':'351','25':'358',
@@ -29,11 +31,16 @@ XValues={'0':'-50','1':'23', '2':'41','3':'48','4':'72','5':'89','6':'96', '7':'
          '79':'1115','80':'1124',
          '81':'1148', '82':'1163','83':'1172',
          '84':'1187','85':'1196','86':'1211', '87':'1220', '88':'1244', '89':'-50'}
-
+## List of all Sharp Notes
 SharpList=[2,5,7,10,12,14,17,19,22,24,26,29,31,34,36,38,41,43,46,48,50,53,55,58,60,
            62, 65,67,70, 72,74,77,79,82,84,86]
+## Notes in between two sharps
 MidList=[1,6,11,13,18,23,25,30,35,37,42,47,49,54,59,61,66,71,73,78,83,85]
+##Notes to the right of a sharp and left of another white note
 RightList=[3,8,15,20,27,32,39,44,51,56,63,68,75,80,87]
+## Left List not needed, because function checks if in SharpList, MidList, RightList, or Else- Else being LeftList
+
+## IMG's for current notes on virtual piano
 SharpIMG=pygame.image.load('SharpD.png')
 RightIMG=pygame.image.load('RBlue.png')
 LeftIMG=pygame.image.load('LBlue.png')
@@ -63,6 +70,7 @@ screen=pygame.display.set_mode(size)
 
 class Draw():
     def GrandStaff(TS):
+        ## Draw Grand Staff
         g=0
         while g<5:
             pygame.draw.line(screen, black, (10, 50+g*6), (1350,50+g*6))
@@ -80,8 +88,10 @@ class Draw():
         while g<4:
             pygame.draw.line(screen, black, (645+g*168,500), (645+g*168,250))
             g+=1
+        ## Blit Treble and Bass
         screen.blit(TrebleIMG, (12,45))
         screen.blit(BassIMG, (6,104))
+        ## Blit Time Signature
         if len(str(TS[0]))==1:
             screen.blit(TimeSig[str(TS[0])], (40,50))
             screen.blit(TimeSig[str(TS[0])], (40,110))
@@ -135,6 +145,7 @@ class Draw():
             return(23)
 
     def Rects(NewTimeList, marker):
+        ## Draw vertical rectangles above virtual piano using NewTimeList for y coordinates and XValues (List) for x coordinates
         g=-1
         for a in NewTimeList:
             g+=1
@@ -144,6 +155,8 @@ class Draw():
                 color=blue
             pygame.draw.rect(screen, color, (Draw.FindXRect(a[1]), (marker/8)+500-Draw.NoteLength(a)-(a[0][0]/8),Draw.NoteWidth(a[1]), ((a[0][1]-a[0][0])/8)))
     def CurrentNotes(CurrentPlaying):
+        ## Blit IMGs of Blue Notes on virtual piano of Notes currently being played
+        ##  using x coordinates from DrawInputsList
         for a in CurrentPlaying:
             if a==0 or a==89:
                 pass
