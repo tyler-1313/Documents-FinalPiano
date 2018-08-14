@@ -72,39 +72,49 @@ FlatList=[2,5,7,10,12,14,17,19,22,24,26,29,31,34,36,38]
            
 SharpList=[41,43,46,48,50,53,55,58,60,
            62, 65,67,70, 72,74,77,79,82,84,86]
-
+#Time Signature
 TS=['','1']
+# Beats Per Minute
 BPM=''
+## x,y coordinates of Blue Notes
 RCoordBlue=[]
-RListBlue=[]
 LCoordBlue=[]
-LListBlue=[]
+## ex: InputListR=[['EthNote', 45], ['EthNote', [52, 55]], ...]
 InputListR=[]
+## example:  InputListR=[['EthNote', 39], ['EthNote', [30, 34]], ...]
 InputListL=[]
+## Current Notes being played for right side and left side of piano (RNow, LNow)
 RNow=[89]
 LNow=[0]
+## Both
 CurrentPlaying=[]
+## marker to compare current note being played to desired note at given point in time (RList[InputMarkerR])
+## if RNow==RList[InputMarkerR]: InputListR.append(...) and InputMarker+=1 
 InputMarkerR=0
 InputMarkerL=0
+##pulls Vertical Rectangles down when added to (marker)
 marker=1
 CSVFile='FurElise.csv'
 NewTimeList=[]
 RList=[['EthNote', 45]]
 LList=[['EthNote', 35]]
 state='MMenu'
-
+## small boxes in 'Practice' section, boxone-five can only have one equal to True at a time
 boxone=True
 boxtwo=False
 boxthree = False
 boxfour=False
 boxfive=False
+## boxsix=nothing
 boxsix=False
+## inp-inf = rectangles you type in in 'Practice' section- starting top left, going right, down
 inp=False
 inb = False
 inc=False
 ind=False
 ine=False
 inf=False
+## include chords
 chordbox=False
 go=False
 NoteTypeList=['WholeNote']
@@ -126,11 +136,14 @@ while True:
     mouse=pygame.mouse.get_pos()
     screen.fill(white)
     if state=='NewCSV':
- #       j=Note.GetNoteList(CSVFile)
+        ## Turning CSV File into NewTimeList
+        j=Note.GetNoteList(CSVFile)
      #  j=[[[0, 960], 0], ...]
         j=NewTimeList
+        ## Splitting into RList, LList
         LList, RList= Note.GetRLLists(j)
      #  LList=[[[0, 960], 0], ((960, 2880), 0), ...]
+     ## Turning chords into [[x,y], [45,56]]] instead of [[[x,y], 56], [[x,y], 45]...]
         RList, LList = Note.FindChords(RList, LList)
         # RList= [[[0,960], [45, 51]], ...]     
         LList, RList= Note.Reduce(LList, RList)
@@ -146,35 +159,39 @@ while True:
         LList, RList=Note.FixPlusRest(LList, RList)  
      #  LList=[['FourthNote', 0], ['EthNote', 0], ...]
         NewTimeList=Note.FixBug(j)
+        #  NewTimeList=[[[1, 959], 0], ([961, 1199], 56), ...]
+        ## makes vertical rectangles above virtual piano look cleaner and fixes a bug
         state=''
         marker=0
     
         
  # Note, Lines, Draw
 
- #  NewTimeList=[[[1, 959], 0], ([961, 1199], 56), ...]
+
     if state=='':
-        Draw.Rects(NewTimeList, marker)
+        Draw.Rects(NewTimeList, marker)  ## Draws Vertical Rectangles each frame, adding to variable marker moves rectangles downwards
 
         pygame.draw.rect(screen, white, (0,0,1300,250)) #block for sheet music
         pygame.draw.rect(screen, white, (0,500,1300,400))
         screen.blit(FullPianoIMG, (0,500))
         Draw.GrandStaff(TS)
-        
+
+        ## R/LCoord holds x,y coordinates of Notes - RCoord for RList, LCoord for LList - MeasR/LCoord = x,y coordinates for measure ends
         RCoord, LCoord, MeasRCoord, MeasLCoord=Note.GetCoord(RList, LList, TS)
 
-        Note.va(RList, RCoord)
-        Note.PlusDot(RList, LList, black, RCoord, LCoord)
+        Note.va(RList, RCoord)  ##blit 8va IMG (above Note) on Notes above 74
+        Note.PlusDot(RList, LList, black, RCoord, LCoord) ## Draw Circle to the right on Note + a half instances
         
-        Note.NoteBlit(LCoord, LList, RCoord, RList)
-        Lines.MeasLines(MeasLCoord, MeasRCoord)                            
+        Note.NoteBlit(LCoord, LList, RCoord, RList) ## Blit Notes onto screen using x,y coordinates 
+        Lines.MeasLines(MeasLCoord, MeasRCoord) ## Draw Measure Lines                           
                    
-        Lines.LedgerLines(RList, RCoord, LList, LCoord)                       
+        Lines.LedgerLines(RList, RCoord, LList, LCoord)  ##Draw Ledger Lines on Notes above the staff                     
 
         for e in events:
             if e.type in [pygame.midi.MIDIIN]:
                 
                 if e.status==144:
+                    ## CurrentPlaying = Notes currently playing with (0,89) default. Notes below 40 show up on left, Notes above 39 show up on right
                     CurrentPlaying.append(e.data1-20)
                     if e.data1-20>39:
                         if RNow==[89]:
@@ -232,9 +249,10 @@ while True:
                     Combined.append(a)
 
         if CheckList==Combined:
-            marker+=110  #Arbitrary number- change to match Note Length
+            marker+=110  #Arbitrary number- change to match Note Length, causes vertical rectangles to move down each frame
+                        ## triggered each frame that CurrentPlaying==[LList[InputMarkerL], RList[InputMarkerR]]
 
-        Draw.CurrentNotes(CurrentPlaying)
+        Draw.CurrentNotes(CurrentPlaying) ## Blit IMGs of blue Notes (on virtual piano) of Notes currently being played on keyboard
         if len(RList)>InputMarkerR:
             if isinstance(RNow, list) and len(RNow)==1:
                 if RNow[0]==RList[InputMarkerR][1]:
@@ -245,7 +263,6 @@ while True:
                     InputListR.append(list((RList[InputMarkerR][0], RNow)))
                     InputMarkerR+=1
         if len(LList)>InputMarkerL:
-           # print(InputMarkerL)
             if isinstance(LNow, list) and len(LNow)==1:
                 if LNow[0]==LList[InputMarkerL][1]:
                     InputListL.append(list((LList[InputMarkerL][0], LNow[0])))
@@ -255,15 +272,20 @@ while True:
                     InputListL.append(list((RList[InputMarkerL][0], LNow)))
                     InputMarkerL+=1
 
+        ## InputCoordR/L holds x,y coordinates of blue notes (notes that have been played on keyboard) from InputListR/L
         InputCoordR, InputCoordL, InputMeasR, InputMeasL=Note.GetCoord(InputListR, InputListL, TS)
+        ## Draws Blue Notes
         Note.DrawInputs(InputCoordL, InputCoordR, LList, RList, InputListL, InputListR)
 
+        ## Draws Lines on Quarter, Eth, or 16th Notes for individual Notes
         Lines.SingleNotesR(RCoord, RList, black, TS)
         Lines.SingleNotesL(LCoord, LList, black, TS)
-        
+
+        ## Draws Lines on Quarter, Eth, or 16th Notes for multiple consecutive Notes
         Lines.MultiNotesR(RCoord, RList, black, TS)
         Lines.MultiNotesL(LCoord, LList, black, TS)
 
+        ## Draws Blue Lines on Quarter, Eth, 16th Notes from InputListR/L
         Lines.SingleNotesR(InputCoordR, InputListR, blue, TS)
         Lines.SingleNotesL(InputCoordL, InputListL, blue, TS)
         Lines.MultiNotesR(InputCoordR, InputListR, blue, TS)
@@ -311,7 +333,7 @@ while True:
         Note.PlusDot(InputListR, InputListL, blue, InputCoordR, InputCoordL)
         pygame.draw.rect(screen, white, (0, 50, 10, 150))
 
-
+  
     Menu.MainMenu(state)
     Menu.Practice(state, boxone,boxtwo,boxthree,boxfour,boxfive, chordbox)
     Menu.Learn(state)
