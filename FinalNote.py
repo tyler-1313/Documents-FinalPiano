@@ -8,11 +8,14 @@ MeasEnderRev={'1':'SixteenthNote', '1.5':'SixteenthNotePlus', '2':'EthNote', '3'
            '6':'FourthNotePlus', '8':'HalfNote', '12':'HalfNotePlus', '16':'WholeNote'}
 MeasEnder={'SixteenthNote':'1', 'SixteenthNotePlus':'1.5', 'EthNote':'2', 'EthNotePlus':'3', 'FourthNote':'4',
            'FourthNotePlus':'6', 'HalfNote':'8', 'HalfNotePlus':'12', 'WholeNote':'16'}
+## Look up Notes 40-89, return amount*3 to subtract from y value of Note Blit
+## 6.66 for 89 happens to be the right number to blit the rest IMG in right place
 NoteDe={'89':'6.66','40':'0', '41':'0', '42':'1', '43':'1', '44':'2', '45':'3', '46':'3', '47':'4', '48':'4', '49':'5', '50':'5', '51':'6', '52':'7',
     '53':'7', '54':'8', '55':'8', '56':'9', '57':'10', '58':'10', '59':'11', '60':'11', '61':'12', '62':'12', '63':'13', '64':'14',
     '65':'14', '75':'13', '76':'14', '66':'15', '77':'14', '78':'15','67':'15', '68':'16', '79':'15', '69':'17', '80':'16', '81':'17',
     '70':'17', '71':'18', '82':'17', '83':'18','72':'18', '73':'19', '84':'18', '74':'19', '85':'19', '86':'19', '87':'20', '88':'21',
 }
+## Same for left side of piano (bottom staff)
 NoteDeL={'0':'-5.66','1':'-23', '2':'-22',  '3':'-22', '4':'-21', '5':'-20', '6':'-20', '7':'-19', '8':'-19', '9':'-18', '10':'-17', '11':'-17',
     '12':'-16', '13':'-16', '14':'-15', '15':'-15', '16':'-14', '17':'-13', '18':'-13', '19':'-12', '20':'-12', '21':'-11', '22':'-10',
     '23':'-10', '24':'-9', '25':'-9', '26':'-8','27':'-8', '28':'-7', '29':'-6', '30':'-6', '31':'-5', '32':'-5', '33':'-4', '34':'-3',
@@ -24,8 +27,9 @@ DoubleNote={'SixteenthNote':'EthNote', 'EthNote':'FourthNote', 'FourthNote':
 StfEnder={'SixteenthNote':'16', 'SixteenthNotePlus':'24', 'EthNote':'32', 'EthNotePlus':'48', 'FourthNote':'64',
            'FourthNotePlus':'96', 'HalfNote':'128', 'HalfNotePlus':'192', 'WholeNote':'256'
           }
+#List of all Flat Notes (1-39)
 FlatList=[2,5,7,10,12,14,17,19,22,24,26,29,31,34,36,38]
-           
+## List of Sharp Notes (40-88)
 SharpList=[41,43,46,48,50,53,55,58,60,
            62, 65,67,70, 72,74,77,79,82,84,86]
 SixteenthNoteRestIMG=pygame.image.load('16thRest.png')
@@ -54,21 +58,23 @@ vaIMG=pygame.image.load('vaIMG.png')
 class Note():
         
     def GetNoteList(CSVFile):
+        
         f = open(CSVFile, 'rt', encoding='latin1')
         csv_f = csv.reader(f)
         g=0
         TimeList=[]
+        ##Transferring data from CSV File to TimeList
         for row in csv_f:
             g+=1
             if len(row[2])>=17:
                 pass
             else:
                 TimeList.append(tuple(((row[1]), int(row[4])-20)))
- #       print(TimeList[0:20], 'here')
         g=0
         NoteList=[]
         NoteTypeList=[]
         NewTimeList=[]
+        ##changing to NewTimeList
         while len(TimeList)>0:
             g=1
             if TimeList[0][1]==TimeList[1][1]:
@@ -83,11 +89,11 @@ class Note():
                 del TimeList[0]
         if NewTimeList[0][0][0]>0:
             NewTimeList.insert(0, list((list(((0, NewTimeList[0][0][0]))), 0)))
-       # print(NewTimeList[0:20])
         return(NewTimeList)
     def GetRLLists(NewTimeList):
         RList=[]
         LList=[]
+        ##Turning NewTimeList into RList(40-88) and LList (1-39)
         for a in NewTimeList:
             if a[1]>39:
                 RList.append(a)
