@@ -504,23 +504,46 @@ class Note():
                 if 89>highs>74:
                     screen.blit(vaIMG, (RCoord[g][0], high-11))
     def NoteBlit(LCoord, LList, RCoord, RList):
+        ## This function takes (x,y) coordinates of RCoord, LCoord and
+        ## prints Notes on the x,y coordinates
+        
         g=-1
         for a in LCoord:
+            ## loop through LCoord and print a Note plus possibly a Sharp/Flat
+            ## IMG next to it for each item. g keeps track of the same number item in LList
             g+=1
+            ## if it is a note, not a chord- a[1] is int for note, and list for chord
             if isinstance(a[1], int) or isinstance(a[1], float):
-                if LList[g][1] in FlatList:
+                ## **How to add scales** - In order to add more scales,
+                ## we have to add settings for each scale and indicate which scale we're in, such as
+                ## with an active variable (CMajor, GMajor, ...)
+                ## ex: if CMajor==True:
+                    ##      if LList[g][1] in FlatList:
+                    ##          screen.blit(FlatIMG, x,y)
+                ##  if GMajor==True:
+                ##      FlatList=GMajorFlatList
+                ##      if LList[g][1] in FlatList:
+                 ##         screen.blit(FlatIMG, x,y)
+                ##      if LList[g][1] in GMajorNaturalList:
+                ##          screen.blit(NaturalIMG, (x,y))
+                ##     ****
+                
+                if LList[g][1] in FlatList:## if Note is a Flat, blit Flat image next to it
                     screen.blit(FlatIMG, (a[0]-10, a[1]-5))
-                if LList[g][1]>0:
+                    
+                if LList[g][1]>0: ## if not a rest (if 1-39)
+                    ## if a HalfNote or WholeNote: blit HalfNoteIMG,
+                    ## else (if 16th, 8th, 4th Note): blit NoteIMG
                     if LList[g][0]!='HalfNote' and LList[g][0]!='WholeNote':
                         screen.blit(NoteIMG, a)
                     else:
                         screen.blit(HalfNoteIMG, a)
-                else:
+                else: ## if it is a rest
                     screen.blit(RestImgs[LList[g][0]], a)
-            else:
+            else: ## if chord
                 d=-1
-     #           print(a)
-                for b in LList[g][1]:
+                for b in LList[g][1]: ## loop through list of y coordinates (LList[g][1]) for notes
+                                    ##   x coordinates are same for chord (a[0])
                     d+=1
                     if b in FlatList:
                         screen.blit(FlatIMG, (a[0]-10, a[1][d]))
